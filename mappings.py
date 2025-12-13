@@ -1,18 +1,15 @@
-# mappings.py (COMPLETE VERSION)
+# mappings.py
 
-# 1. LUNAR MONTHS
 LUNAR_MONTHS = {
     "ಚೈತ್ರ": 1, "ವೈಶಾಖ": 2, "ಜ್ಯೇಷ್ಠ": 3, "ಆಷಾಢ": 4, "ಶ್ರಾವಣ": 5, "ಭಾದ್ರಪದ": 6,
     "ಆಶ್ವಯುಜ": 7, "ಆಶ್ವೀಜ": 7, "ಕಾರ್ತಿಕ": 8, "ಮಾರ್ಗಶಿರ": 9, "ಪುಷ್ಯ": 10, "ಪೌಷ": 10,
     "ಮಾಘ": 11, "ಫಾಲ್ಗುಣ": 12
 }
 
-# 2. PAKSHA
 PAKSHA = {
     "ಶು": "Shukla", "ಬ": "Krishna", "ಶುದ್ದ": "Shukla", "ಬಹುಳ": "Krishna"
 }
 
-# 3. TITHI
 TITHIS = {
     "ಪಾಡ್ಯ": 1, "ಪ್ರಥಮ": 1, "ಬಿದಿಗೆ": 2, "ದ್ವಿತೀಯ": 2, "ತದಿಗೆ": 3, "ತೃತೀಯ": 3,
     "ಚೌತಿ": 4, "ಚತುರ್ಥಿ": 4, "ಪಂಚಮಿ": 5, "ಷಷ್ಠಿ": 6, "ಷಷ್ಟಿ": 6, "ಸಪ್ತಮಿ": 7,
@@ -21,13 +18,11 @@ TITHIS = {
     "ಅಮಾವಾಸ್ಯೆ": 30
 }
 
-# 4. SOLAR MONTHS
 SOLAR_MONTHS = {
     "ಮೇಷ": 1, "ವೃಷಭ": 2, "ಮಿಥುನ": 3, "ಕರ್ಕಾಟಕ": 4, "ಸಿಂಹ": 5, "ಕನ್ಯಾ": 6,
     "ತುಲಾ": 7, "ವೃಶ್ಚಿಕ": 8, "ಧನು": 9, "ಮಕರ": 10, "ಕುಂಭ": 11, "ಮೀನ": 12
 }
 
-# 5. NAKSHATRAS
 NAKSHATRAS = {
     "ಅಶ್ವಿನಿ": 1, "ಭರಣಿ": 2, "ಕೃತ್ತಿಕಾ": 3, "ರೋಹಿಣಿ": 4, "ಮೃಗಶಿರ": 5, "ಆರ್ದ್ರಾ": 6,
     "ಪುನರ್ವಸು": 7, "ಪುಷ್ಯ": 8, "ಆಶ್ಲೇಷ": 9, "ಮಖ": 10, "ಮಘ": 10, "ಪುಬ್ಬ": 11,
@@ -39,16 +34,38 @@ NAKSHATRAS = {
     "ಉತ್ತರಾಭಾದ್ರ": 26, "ಉ.ಭಾದ್ರಾ": 26, "ರೇವತಿ": 27
 }
 
-# 6. FESTIVAL RULES (This was likely missing!)
+# Added "time": "midnight" for Shivaratri to fix the 1-day error
 FESTIVAL_RULES = {
     "ಚಾಂದ್ರಮಾನ ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
     "ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
     "ಶ್ರೀರಾಮ ನವಮಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 9},
-    "ಮಹಾಶಿವರಾತ್ರಿ": {"type": "lunar", "month": 11, "paksha": "Krishna", "tithi": 14},
+    "ಮಹಾಶಿವರಾತ್ರಿ": {"type": "lunar", "month": 11, "paksha": "Krishna", "tithi": 14, "time": "midnight"}, # <--- CHANGED
     "ಗಣೇಶ ಚತುರ್ಥಿ": {"type": "lunar", "month": 6, "paksha": "Shukla", "tithi": 4},
     "ವಿಜಯ ದಶಮಿ": {"type": "lunar", "month": 7, "paksha": "Shukla", "tithi": 10},
     "ದೀಪಾವಳಿ": {"type": "lunar", "month": 7, "paksha": "Krishna", "tithi": 30},
     "ಸುಬ್ರಹ್ಮಣ್ಯ ಷಷ್ಠಿ": {"type": "lunar", "month": 9, "paksha": "Shukla", "tithi": 6},
     "ವಿಷು": {"type": "solar_start", "month": 1},
     "ತಿರು ಓಣಂ": {"type": "solar", "month": 5, "star": 22},
+}
+
+# mappings.py (APPEND THIS TO THE END)
+
+# 7. WEEKDAYS (For "1st Sunday" logic)
+WEEKDAYS = {
+    "ಭಾನುವಾರ": 6, "ರವಿವಾರ": 6, "Sunday": 6,
+    "ಸೋಮವಾರ": 0, "Monday": 0,
+    "ಮಂಗಳವಾರ": 1, "Tuesday": 1,
+    "ಬುಧವಾರ": 2, "Wednesday": 2,
+    "ಗುರುವಾರ": 3, "Thursday": 3,
+    "ಶುಕ್ರವಾರ": 4, "Friday": 4,
+    "ಶನಿವಾರ": 5, "Saturday": 5
+}
+
+# 8. KANNADA ORDINALS (For "1st", "2nd")
+ORDINALS = {
+    "1ನೇ": 1, "1ನೆ": 1, "ಒಂದನೇ": 1, "First": 1,
+    "2ನೇ": 2, "2ನೆ": 2, "ಎರಡನೇ": 2, "Second": 2,
+    "3ನೇ": 3, "3ನೆ": 3, "ಮೂರನೇ": 3, "Third": 3,
+    "4ನೇ": 4, "4ನೆ": 4, "ನಾಲ್ಕನೇ": 4, "Fourth": 4,
+    "ಕಡೆಯ": -1, "ಕೊನೆಯ": -1, "Last": -1
 }
