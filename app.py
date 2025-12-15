@@ -23,12 +23,20 @@ st.sidebar.info("User input disabled.")
 
 @st.cache_data
 def load_data():
+    # Update this path if needed
+    file_path = "data/Total Pooja List.xlsx"
     try:
-        df = pd.read_excel("data/Total Pooja List.xlsx", sheet_name=0, header=3, dtype=str)
+        import os
+        if not os.path.exists(file_path):
+            st.error(f"File not found: {file_path}")
+            return None
+
+        df = pd.read_excel(file_path, sheet_name=0, header=3, dtype=str)
         df.columns = df.columns.str.strip()
         df = df.dropna(how='all')
         return df
-    except:
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
         return None
 
 
@@ -43,7 +51,9 @@ if df is not None:
 
         for index, row in df.iterrows():
             name = row.get('ಹೆಸರು', 'Unknown')
-            original_text = str(row.get('ನಿಗದಿತ ದಿನ', '')).strip()
+            # Handle NaN values explicitly
+            raw_text = row.get('ನಿಗದಿತ ದಿನ', '')
+            original_text = str(raw_text).strip() if pd.notna(raw_text) else ""
 
             # --- FILL DOWN LOGIC ---
             month_found = False
@@ -54,7 +64,7 @@ if df is not None:
                     break
 
             final_text = original_text
-            if not month_found and last_seen_month:
+            if not month_found and last_seen_month and original_text:
                 is_pattern = False
                 for w in WEEKDAYS:
                     if w in original_text: is_pattern = True; break
@@ -70,52 +80,55 @@ if df is not None:
             # --- CALCULATION STRATEGIES ---
             calc_date, note = "Unknown", ""
 
-            # 1. English Date / Pattern
-            res = get_english_date(final_text, target_year)
-            if res:
-                calc_date, note = res, "English/Pattern"
+            if not original_text:
+                calc_date, note = "No Data", "Empty Row"
             else:
-                # 2. Festivals
-                res = get_festival_date(original_text, target_year)
+                # 1. English Date / Pattern
+                res = get_english_date(final_text, target_year)
                 if res:
-                    calc_date, note = res, "Festival"
+                    calc_date, note = res, "English/Pattern"
                 else:
-                    # 3. Lunar Tithi
-                    res = get_lunar_date(final_text, target_year)
-                    if res and "Not Found" not in res:
-                        calc_date, note = res, "Lunar Tithi"
+                    # 2. Festivals
+                    res = get_festival_date(original_text, target_year)
+                    if res:
+                        calc_date, note = res, "Festival"
                     else:
-                        # 4. Solar Star
-                        res = get_solar_date(final_text, target_year)
-                        if res and "Check" not in res:
-                            calc_date, note = res, "Solar Star"
+                        # 3. Lunar Tithi
+                        res = get_lunar_date(final_text, target_year)
+                        if res and "Not Found" not in res:
+                            calc_date, note = res, "Lunar Tithi"
                         else:
-                            # 5. Solar Month + Tithi
-                            res = get_solar_month_tithi_date(final_text, target_year)
+                            # 4. Solar Star
+                            res = get_solar_date(final_text, target_year)
                             if res and "Check" not in res:
-                                calc_date, note = res, "Solar + Tithi"
+                                calc_date, note = res, "Solar Star"
                             else:
-                                # 6. Lunar Month + Star
-                                res = get_lunar_month_star_date(final_text, target_year)
-                                if res:
-                                    calc_date, note = res, "Lunar + Star"
+                                # 5. Solar Month + Tithi
+                                res = get_solar_month_tithi_date(final_text, target_year)
+                                if res and "Check" not in res:
+                                    calc_date, note = res, "Solar + Tithi"
                                 else:
-                                    # 7. Gregorian Month + Star
-                                    res = get_gregorian_month_star_date(final_text, target_year)
+                                    # 6. Lunar Month + Star
+                                    res = get_lunar_month_star_date(final_text, target_year)
                                     if res:
-                                        calc_date, note = res, "Gregorian + Star"
+                                        calc_date, note = res, "Lunar + Star"
                                     else:
-                                        # 8. Gregorian Month + Tithi
-                                        res = get_gregorian_month_tithi_date(final_text, target_year)
+                                        # 7. Gregorian Month + Star
+                                        res = get_gregorian_month_star_date(final_text, target_year)
                                         if res:
-                                            calc_date, note = res, "Gregorian + Tithi"
+                                            calc_date, note = res, "Gregorian + Star"
                                         else:
-                                            # 9. Solar Day Number
-                                            res = get_solar_day_date(final_text, target_year)
+                                            # 8. Gregorian Month + Tithi
+                                            res = get_gregorian_month_tithi_date(final_text, target_year)
                                             if res:
-                                                calc_date, note = res, "Solar Day No."
+                                                calc_date, note = res, "Gregorian + Tithi"
                                             else:
-                                                calc_date, note = "Manual Check", "Unknown Format"
+                                                # 9. Solar Day Number
+                                                res = get_solar_day_date(final_text, target_year)
+                                                if res:
+                                                    calc_date, note = res, "Solar Day No."
+                                                else:
+                                                    calc_date, note = "Manual Check", "Unknown Format"
 
             results.append({
                 "Name": name,
@@ -135,4 +148,4 @@ if df is not None:
         csv = res_df.to_csv(index=False).encode('utf-8')
         st.download_button("Download CSV", csv, f"Pooja_List_{target_year}.csv", "text/csv")
 else:
-    st.error("Could not load data. Ensure 'data/Total Pooja List.xlsx' exists.")
+    st.write("Data not loaded.")
