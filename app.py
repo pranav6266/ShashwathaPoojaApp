@@ -23,7 +23,7 @@ st.sidebar.info("User input disabled.")
 
 @st.cache_data
 def load_data():
-    # Update this path if needed
+    # Make sure this matches your exact file name on disk
     file_path = "data/Total Pooja List.xlsx"
     try:
         import os
@@ -51,11 +51,10 @@ if df is not None:
 
         for index, row in df.iterrows():
             name = row.get('ಹೆಸರು', 'Unknown')
-            # Handle NaN values explicitly
             raw_text = row.get('ನಿಗದಿತ ದಿನ', '')
             original_text = str(raw_text).strip() if pd.notna(raw_text) else ""
 
-            # --- FILL DOWN LOGIC ---
+            # --- FILL DOWN LOGIC (Improved) ---
             month_found = False
             for km in KANNADA_MONTHS:
                 if km in original_text:

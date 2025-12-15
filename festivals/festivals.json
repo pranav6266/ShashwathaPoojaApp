@@ -8,7 +8,6 @@
   "ನರಸಿಂಹ ಜಯಂತಿ": { "type": "lunar", "month": 2, "paksha": "Shukla", "tithi": 14 },
   "ವಿದ್ಯಾರಣ್ಯತಿಥಿ": { "type": "lunar", "month": 2, "paksha": "Shukla", "tithi": 13 },
   "ವಟ ಸಾವಿತ್ರಿ": { "type": "lunar", "month": 3, "paksha": "Shukla", "tithi": 15 },
-  "ಋಗುಪಾಕರ್ಮ": { "type": "lunar_star", "month": 5, "star": 22 },
   "ನಾಗರ ಪಂಚಮಿ": { "type": "lunar", "month": 5, "paksha": "Shukla", "tithi": 5 },
   "ವರಮಹಾಲಕ್ಷ್ಮೀ ವ್ರತ": { "type": "lunar_weekday", "month": 5, "paksha": "Shukla", "tithi_max": 15, "weekday": "Friday" },
   "ವರಮಹಾಲಕ್ಷ್ಮೀ ಪೂಜಾ ದಿನ": { "type": "lunar_weekday", "month": 5, "paksha": "Shukla", "tithi_max": 15, "weekday": "Friday" },
@@ -44,5 +43,16 @@
   "ಕಾವೇರಿ ಸಂಕ್ರಾಂತಿ": { "type": "solar_start", "month": 7 },
   "ವಿಷು": { "type": "solar_start", "month": 1 },
   "ಸೌರ ಯುಗಾದಿ": { "type": "solar_start", "month": 1 },
-  "ತಿರು ಓಣಂ": { "type": "solar", "month": 5, "star": 22 }
+  "ತಿರು ಓಣಂ": { "type": "solar", "month": 5, "star": 22 },
+  "ಋಗುಪಾಕರ್ಮ": {
+    "type": "lunar_star",
+    "month": "ಶ್ರಾವಣ",
+    "star": "ಶ್ರವಣ"
+  },
+  "ಯಜುರುಪಾಕರ್ಮ": {
+    "type": "lunar",
+    "month": "ಶ್ರಾವಣ",
+    "paksha": "Shukla",
+    "tithi": 15
+  }
 }

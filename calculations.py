@@ -14,6 +14,7 @@ _FESTIVALS_CACHE = None
 
 # --- 1. SETUP ---
 try:
+    # Use relative path for robustness
     PLANETS = load('data/de421.bsp')
     EARTH = PLANETS['earth']
     MOON = PLANETS['moon']
@@ -39,13 +40,16 @@ def get_sidereal_sun_longitude(e):
 
 
 def clean_input_string(s):
-    """Clean input but PRESERVE DOTS for abbreviations like 'Poo.Shada'."""
+    """Clean input: remove noise words, replace dots with space."""
     if not isinstance(s, str): return ""
-    # Remove parens
     s = s.replace("(", " ").replace(")", " ")
-    # Replace hyphens with space
-    s = s.replace("-", " ")
-    # Normalize spaces
+    s = s.replace(".", " ").replace("-", " ")  # Replace separators with space
+
+    # Remove noise words common in Kannada dates
+    noise_words = ["ತಿಂಗಳ", "ಮಾಸ", "ನಕ್ಷತ್ರ", "ಪಕ್ಷದ", "ದಿನಾಂಕ", "ರಂದು"]
+    for w in noise_words:
+        s = s.replace(w, " ")
+
     s = " ".join(s.split())
     return s
 
@@ -53,7 +57,7 @@ def clean_input_string(s):
 def parse_kannada_date(text):
     """
     Greedy parser: Finds longest matching keys from mappings first,
-    removes them from text, and continues. This prevents 'Ba' matching inside 'October'.
+    removes them from text, and continues.
     """
     cleaned = clean_input_string(text)
 
@@ -70,21 +74,24 @@ def parse_kannada_date(text):
 
     # Helper to consume keys
     def consume_map(mapping, result_key):
+        nonlocal cleaned
         # Sort keys by length desc to match "Poo.Shada" before "Poo"
         keys = sorted(mapping.keys(), key=len, reverse=True)
         for k in keys:
             if k in cleaned:
                 result[result_key] = mapping[k]
                 # Remove the found key from text to avoid double matching
-                return cleaned.replace(k, " ")
-        return cleaned
+                cleaned = cleaned.replace(k, " ")
+                # We don't return here; we allow finding multiple non-overlapping items if needed
+                # (though for same category usually one exists)
+                return
 
-    cleaned = consume_map(LUNAR_MONTHS, 'lunar_month')
-    cleaned = consume_map(SOLAR_MONTHS, 'solar_month')
-    cleaned = consume_map(KANNADA_MONTHS, 'kannada_month')  # Gregorian names in Kannada
-    cleaned = consume_map(NAKSHATRAS, 'star')
-    cleaned = consume_map(PAKSHA, 'paksha')
-    cleaned = consume_map(TITHIS, 'tithi')
+    consume_map(LUNAR_MONTHS, 'lunar_month')
+    consume_map(SOLAR_MONTHS, 'solar_month')
+    consume_map(KANNADA_MONTHS, 'kannada_month')  # Gregorian names in Kannada
+    consume_map(NAKSHATRAS, 'star')
+    consume_map(PAKSHA, 'paksha')
+    consume_map(TITHIS, 'tithi')
 
     return result
 
@@ -94,7 +101,6 @@ def get_english_date(date_str, year):
     if not isinstance(date_str, str): return None
     s = clean_input_string(date_str)
 
-    # Check for patterns like "January 1st Sunday"
     found_weekday, found_month, found_ord = None, None, 1
 
     for k, v in WEEKDAYS.items():
@@ -109,9 +115,7 @@ def get_english_date(date_str, year):
     if found_month and found_weekday is not None:
         return calculate_nth_weekday(year, found_month, found_weekday, found_ord)
 
-    # Check for simple "May 5"
     if found_month:
-        # Look for numbers
         nums = re.findall(r'\d+', s)
         if nums:
             d = int(nums[0])
@@ -120,9 +124,7 @@ def get_english_date(date_str, year):
             except:
                 pass
         else:
-            # Default to 1st if no day found
             return datetime.date(year, found_month, 1).strftime("%d-%m-%Y")
-
     return None
 
 
@@ -190,7 +192,6 @@ def get_lunar_date(kannada_string, year):
     p = parse_kannada_date(kannada_string)
 
     if p['lunar_month'] and p['tithi']:
-        # Implicit Paksha: 15 is Shukla Purnima, 30 is Krishna Amavasya
         if p['tithi'] == 15 and not p['paksha']: p['paksha'] = "Shukla"
         if p['tithi'] == 30 and not p['paksha']: p['paksha'] = "Krishna"
 
@@ -227,7 +228,6 @@ def get_lunar_month_star_date(kannada_string, year):
 def get_solar_date(kannada_string, year):
     if PLANETS is None: return "Error"
     p = parse_kannada_date(kannada_string)
-
     if p['solar_month'] and p['star']:
         return calculate_solar_span_event(year, p['solar_month'], "star", p['star'])
     return None
@@ -236,7 +236,6 @@ def get_solar_date(kannada_string, year):
 def get_solar_month_tithi_date(kannada_string, year):
     if PLANETS is None: return "Error"
     p = parse_kannada_date(kannada_string)
-
     if p['solar_month'] and p['paksha'] and p['tithi']:
         target = p['tithi']
         if p['paksha'] == "Krishna": target += 15
@@ -247,8 +246,6 @@ def get_solar_month_tithi_date(kannada_string, year):
 def get_solar_day_date(kannada_string, year):
     if PLANETS is None: return "Error"
     p = parse_kannada_date(kannada_string)
-
-    # Needs Solar Month and a specific day number (e.g. "Simha 10")
     if p['solar_month'] and p['day_number']:
         start_greg = p['solar_month'] + 3
         if start_greg > 12: start_greg -= 12
@@ -258,7 +255,6 @@ def get_solar_day_date(kannada_string, year):
             t, e = get_astronomy_at(search)
             s_deg = get_sidereal_sun_longitude(e)
             s_idx = int(s_deg / 30) + 1
-
             if s_idx == p['solar_month']:
                 target_date = search + datetime.timedelta(days=p['day_number'] - 1)
                 return target_date.strftime("%d-%m-%Y")
@@ -275,7 +271,6 @@ def calculate_solar_span_event(year, solar_month_idx, event_type, target_val):
         if search.year != year:
             search += datetime.timedelta(days=1)
             continue
-
         t, e = get_astronomy_at(search, 1, 0)
         s_deg = get_sidereal_sun_longitude(e)
         s_idx = int(s_deg / 30) + 1
@@ -286,14 +281,12 @@ def calculate_solar_span_event(year, solar_month_idx, event_type, target_val):
                 m_deg = (m_lon.degrees - AYANAMSA) % 360
                 curr_star = int(m_deg / (360 / 27)) + 1
                 if curr_star == target_val: return search.strftime("%d-%m-%Y")
-
             elif event_type == "tithi":
                 _, m_lon, _ = e.observe(MOON).apparent().ecliptic_latlon()
                 _, s_lon, _ = e.observe(SUN).apparent().ecliptic_latlon()
                 angle = (m_lon.degrees - s_lon.degrees) % 360
                 curr_tithi = int(angle / 12) + 1
                 if curr_tithi == target_val: return search.strftime("%d-%m-%Y")
-
         search += datetime.timedelta(days=1)
     return "Check Manual"
 
@@ -302,19 +295,16 @@ def calculate_solar_span_event(year, solar_month_idx, event_type, target_val):
 def get_gregorian_month_star_date(kannada_string, year):
     if PLANETS is None: return "Error"
     p = parse_kannada_date(kannada_string)
-
     if p['kannada_month'] and p['star']:
         for day in range(1, 32):
             try:
                 current_date = datetime.date(year, p['kannada_month'], day)
             except ValueError:
                 break
-
             t, e = get_astronomy_at(current_date)
             _, m_lon, _ = e.observe(MOON).apparent().ecliptic_latlon()
             m_deg = (m_lon.degrees - AYANAMSA) % 360
             curr_star = int(m_deg / (360 / 27)) + 1
-
             if curr_star == p['star']:
                 return current_date.strftime("%d-%m-%Y")
     return None
@@ -323,23 +313,19 @@ def get_gregorian_month_star_date(kannada_string, year):
 def get_gregorian_month_tithi_date(kannada_string, year):
     if PLANETS is None: return "Error"
     p = parse_kannada_date(kannada_string)
-
     if p['kannada_month'] and p['paksha'] and p['tithi']:
         target_tithi = p['tithi']
         if p['paksha'] == "Krishna": target_tithi += 15
-
         for day in range(1, 32):
             try:
                 current_date = datetime.date(year, p['kannada_month'], day)
             except ValueError:
                 break
-
             t, e = get_astronomy_at(current_date)
             _, m_lon, _ = e.observe(MOON).apparent().ecliptic_latlon()
             _, s_lon, _ = e.observe(SUN).apparent().ecliptic_latlon()
             angle = (m_lon.degrees - s_lon.degrees) % 360
             curr_tithi = int(angle / 12) + 1
-
             if curr_tithi == target_tithi:
                 return current_date.strftime("%d-%m-%Y")
     return None
@@ -376,7 +362,6 @@ def calculate_lunar_weekday_relative(year, month_idx, paksha, tithi_max, target_
 
 
 def get_festival_date(kannada_string, year):
-    # Strip trailing numbers like "-28"
     s = re.sub(r'[\-\s]+\d+$', '', kannada_string).strip()
     s = clean_input_string(s)
 
@@ -384,7 +369,6 @@ def get_festival_date(kannada_string, year):
     if s in rules:
         rule = rules[s]
         rtype = rule["type"]
-
         if rtype == "lunar":
             return calculate_accurate_lunar_date(
                 rule["month"], rule["paksha"], rule["tithi"], year, rule.get("time", "sunrise")
@@ -393,7 +377,6 @@ def get_festival_date(kannada_string, year):
             m_name = list(LUNAR_MONTHS.keys())[list(LUNAR_MONTHS.values()).index(rule['month'])]
             s_name = list(NAKSHATRAS.keys())[list(NAKSHATRAS.values()).index(rule['star'])]
             return get_lunar_month_star_date(f"{m_name} {s_name}", year)
-
         elif rtype == "lunar_weekday":
             return calculate_lunar_weekday_relative(
                 year, rule["month"], rule["paksha"], rule["tithi_max"], rule["weekday"]
