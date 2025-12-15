@@ -53,37 +53,42 @@ def get_english_date(date_str, year):
     if not isinstance(date_str, str): return None
     date_str = date_str.strip()
 
-    # Standard Month-Day
+    # 1. Just Month Name (e.g., "May", "ಜೂನ್") -> Default to 1st
+    if date_str in KANNADA_MONTHS:
+        return datetime.date(year, KANNADA_MONTHS[date_str], 1).strftime("%d-%m-%Y")
+
+    # 2. Standard Month-Day (e.g., "May-5")
     if "-" in date_str:
         parts = date_str.split("-")
         if len(parts) == 2:
             m, d = parts[0].strip(), parts[1].strip()
             if m in KANNADA_MONTHS:
                 try:
-                    # Clean day string (remove extra chars)
                     import re
-                    d_num = int(re.search(r'\d+', d).group())
-                    return datetime.date(year, KANNADA_MONTHS[m], d_num).strftime("%d-%m-%Y")
+                    d_matches = re.findall(r'\d+', d)
+                    if d_matches:
+                        d_num = int(d_matches[0])
+                        return datetime.date(year, KANNADA_MONTHS[m], d_num).strftime("%d-%m-%Y")
                 except:
                     pass
 
-    # Pattern Logic (e.g., November 1st Sunday)
+    # 3. Pattern Logic (e.g., "January 1st Sunday")
     found_weekday = None
     for k, v in WEEKDAYS.items():
-        if k in date_str:
-            found_weekday = v
-            break
+        if k in date_str: found_weekday = v; break
 
     if found_weekday is not None:
         found_month = None
         for k, v in KANNADA_MONTHS.items():
             if k in date_str: found_month = v; break
+
         found_ord = 1
         for k, v in ORDINALS.items():
             if k in date_str: found_ord = v; break
 
         if found_month:
             return calculate_nth_weekday(year, found_month, found_weekday, found_ord)
+
     return None
 
 
@@ -177,13 +182,22 @@ def get_lunar_date(kannada_string, year):
     clean_str = kannada_string.replace("-", " ").replace(".", " ")
     parts = clean_str.split()
     f_month, f_paksha, f_tithi = None, None, None
+
     for p in parts:
         p = p.strip()
         if p in LUNAR_MONTHS: f_month = LUNAR_MONTHS[p]
         if p in PAKSHA: f_paksha = PAKSHA[p]
         if p in TITHIS: f_tithi = TITHIS[p]
-    if f_month and f_paksha and f_tithi:
-        return calculate_accurate_lunar_date(f_month, f_paksha, f_tithi, year)
+
+    # Implicit Paksha Handling
+    # If Tithi is Purnima (15) or Amavasya (30), we don't strictly need Paksha
+    if f_month and f_tithi:
+        if f_tithi == 15: f_paksha = "Shukla"
+        if f_tithi == 30: f_paksha = "Krishna"
+
+        if f_paksha:
+            return calculate_accurate_lunar_date(f_month, f_paksha, f_tithi, year)
+
     return None
 
 
@@ -342,29 +356,29 @@ def load_festivals():
 
 
 def get_festival_date(kannada_string, year):
-    kannada_string = kannada_string.strip()
+    # 1. Clean the input string (Remove trailing numbers like "-28")
+    import re
+    # This removes "-28" or " 28" from end of string
+    clean_key = re.sub(r'[\-\s]+\d+$', '', kannada_string).strip()
+
     rules = load_festivals()
 
-    if kannada_string in rules:
-        rule = rules[kannada_string]
+    if clean_key in rules:
+        rule = rules[clean_key]
 
         if rule["type"] == "lunar":
             return calculate_accurate_lunar_date(
-                rule["month"],
-                rule["paksha"],
-                rule["tithi"],
-                year,
-                rule.get("time", "sunrise")
+                rule["month"], rule["paksha"], rule["tithi"], year, rule.get("time", "sunrise")
             )
-
+        elif rule["type"] == "lunar_star":
+            # Special case for Rugupakarma (Month + Star)
+            # Reuse get_lunar_month_star_date logic but hardcoded params
+            dummy_str = f"{list(LUNAR_MONTHS.keys())[list(LUNAR_MONTHS.values()).index(rule['month'])]} {list(NAKSHATRAS.keys())[list(NAKSHATRAS.values()).index(rule['star'])]}"
+            return get_lunar_month_star_date(dummy_str, year)
         elif rule["type"] == "solar_start":
-            # Start of a Solar Month (e.g. Vishu -> Mesha 1)
-            # We construct a fake string "Mesha 1" and use existing logic
             m_name = list(SOLAR_MONTHS.keys())[list(SOLAR_MONTHS.values()).index(rule['month'])]
             return get_solar_day_date(f"{m_name} 1", year)
-
         elif rule["type"] == "solar":
-            # Solar month + Star (e.g. Onam)
             if "star" in rule:
                 return calculate_solar_span_event(year, rule["month"], "star", rule["star"])
 
