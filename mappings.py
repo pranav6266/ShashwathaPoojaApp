@@ -39,7 +39,8 @@ FESTIVAL_RULES = {
     "ಚಾಂದ್ರಮಾನ ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
     "ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
     "ಶ್ರೀರಾಮ ನವಮಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 9},
-    "ಮಹಾಶಿವರಾತ್ರಿ": {"type": "lunar", "month": 11, "paksha": "Krishna", "tithi": 14, "time": "midnight"}, # <--- CHANGED
+    "ಮಹಾಶಿವರಾತ್ರಿ": {"type": "lunar", "month": 11, "paksha": "Krishna", "tithi": 14, "time": "midnight"},
+    "ಕಾವೇರಿ ಸಂಕ್ರಾಂತಿ": {"type": "solar_start", "month": 7},
     "ಗಣೇಶ ಚತುರ್ಥಿ": {"type": "lunar", "month": 6, "paksha": "Shukla", "tithi": 4},
     "ವಿಜಯ ದಶಮಿ": {"type": "lunar", "month": 7, "paksha": "Shukla", "tithi": 10},
     "ದೀಪಾವಳಿ": {"type": "lunar", "month": 7, "paksha": "Krishna", "tithi": 30},
