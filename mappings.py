@@ -34,24 +34,6 @@ NAKSHATRAS = {
     "ಉತ್ತರಾಭಾದ್ರ": 26, "ಉ.ಭಾದ್ರಾ": 26, "ರೇವತಿ": 27
 }
 
-# Added "time": "midnight" for Shivaratri to fix the 1-day error
-FESTIVAL_RULES = {
-    "ಚಾಂದ್ರಮಾನ ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
-    "ಯುಗಾದಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 1},
-    "ಶ್ರೀರಾಮ ನವಮಿ": {"type": "lunar", "month": 1, "paksha": "Shukla", "tithi": 9},
-    "ಮಹಾಶಿವರಾತ್ರಿ": {"type": "lunar", "month": 11, "paksha": "Krishna", "tithi": 14, "time": "midnight"},
-    "ಕಾವೇರಿ ಸಂಕ್ರಾಂತಿ": {"type": "solar_start", "month": 7},
-    "ಗಣೇಶ ಚತುರ್ಥಿ": {"type": "lunar", "month": 6, "paksha": "Shukla", "tithi": 4},
-    "ವಿಜಯ ದಶಮಿ": {"type": "lunar", "month": 7, "paksha": "Shukla", "tithi": 10},
-    "ದೀಪಾವಳಿ": {"type": "lunar", "month": 7, "paksha": "Krishna", "tithi": 30},
-    "ಸುಬ್ರಹ್ಮಣ್ಯ ಷಷ್ಠಿ": {"type": "lunar", "month": 9, "paksha": "Shukla", "tithi": 6},
-    "ವಿಷು": {"type": "solar_start", "month": 1},
-    "ತಿರು ಓಣಂ": {"type": "solar", "month": 5, "star": 22},
-}
-
-# mappings.py (APPEND THIS TO THE END)
-
-# 7. WEEKDAYS (For "1st Sunday" logic)
 WEEKDAYS = {
     "ಭಾನುವಾರ": 6, "ರವಿವಾರ": 6, "Sunday": 6,
     "ಸೋಮವಾರ": 0, "Monday": 0,
@@ -62,7 +44,6 @@ WEEKDAYS = {
     "ಶನಿವಾರ": 5, "Saturday": 5
 }
 
-# 8. KANNADA ORDINALS (For "1st", "2nd")
 ORDINALS = {
     "1ನೇ": 1, "1ನೆ": 1, "ಒಂದನೇ": 1, "First": 1,
     "2ನೇ": 2, "2ನೆ": 2, "ಎರಡನೇ": 2, "Second": 2,

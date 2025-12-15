@@ -1,0 +1,78 @@
+{
+  "ಚಾಂದ್ರಮಾನ ಯುಗಾದಿ": {
+    "type": "lunar",
+    "month": 1,
+    "paksha": "Shukla",
+    "tithi": 1
+  },
+  "ಯುಗಾದಿ": {
+    "type": "lunar",
+    "month": 1,
+    "paksha": "Shukla",
+    "tithi": 1
+  },
+  "ಶ್ರೀರಾಮ ನವಮಿ": {
+    "type": "lunar",
+    "month": 1,
+    "paksha": "Shukla",
+    "tithi": 9
+  },
+  "ಅಕ್ಷಯ ತದಿಗೆ": {
+    "type": "lunar",
+    "month": 2,
+    "paksha": "Shukla",
+    "tithi": 3
+  },
+  "ಗಣೇಶ ಚತುರ್ಥಿ": {
+    "type": "lunar",
+    "month": 6,
+    "paksha": "Shukla",
+    "tithi": 4
+  },
+  "ವರಮಹಾಲಕ್ಷ್ಮೀ ವ್ರತ": {
+    "type": "lunar_weekday",
+    "month": 5,
+    "paksha": "Shukla",
+    "tithi_max": 15,
+    "weekday": "Friday",
+    "description": "Last Friday before Shravana Purnima"
+  },
+  "ವಿಜಯ ದಶಮಿ": {
+    "type": "lunar",
+    "month": 7,
+    "paksha": "Shukla",
+    "tithi": 10
+  },
+  "ದೀಪಾವಳಿ": {
+    "type": "lunar",
+    "month": 7,
+    "paksha": "Krishna",
+    "tithi": 30
+  },
+  "ಸುಬ್ರಹ್ಮಣ್ಯ ಷಷ್ಠಿ": {
+    "type": "lunar",
+    "month": 9,
+    "paksha": "Shukla",
+    "tithi": 6
+  },
+  "ಮಹಾಶಿವರಾತ್ರಿ": {
+    "type": "lunar",
+    "month": 11,
+    "paksha": "Krishna",
+    "tithi": 14,
+    "time": "midnight"
+  },
+  "ಕಾವೇರಿ ಸಂಕ್ರಾಂತಿ": {
+    "type": "solar_start",
+    "month": 7
+  },
+  "ವಿಷು": {
+    "type": "solar_start",
+    "month": 1
+  },
+  "ತಿರು ಓಣಂ": {
+    "type": "solar",
+    "month": 5,
+    "star": 22
+  }
+}
