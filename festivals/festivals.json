@@ -45,14 +45,14 @@
   "ಸೌರ ಯುಗಾದಿ": { "type": "solar_start", "month": 1 },
   "ತಿರು ಓಣಂ": { "type": "solar", "month": 5, "star": 22 },
   "ಋಗುಪಾಕರ್ಮ": {
-    "type": "lunar_star",
-    "month": "ಶ್ರಾವಣ",
-    "star": "ಶ್ರವಣ"
-  },
-  "ಯಜುರುಪಾಕರ್ಮ": {
-    "type": "lunar",
-    "month": "ಶ್ರಾವಣ",
-    "paksha": "Shukla",
-    "tithi": 15
-  }
+  "type": "lunar_star",
+  "month": 5,
+  "star": 22
+},
+"ಯಜುರುಪಾಕರ್ಮ": {
+  "type": "lunar",
+  "month": 5,
+  "paksha": "Shukla",
+  "tithi": 15
+}
 }
